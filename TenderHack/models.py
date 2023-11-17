@@ -78,7 +78,7 @@ class User(AbstractBaseUser):
 
 class SupplierBan(models.Model):
     supplier = models.ForeignKey(
-        "Company",
+        "Subdivision",
         on_delete=models.CASCADE,
         related_name="bans",
         null=False,
@@ -100,8 +100,11 @@ class SupplierBan(models.Model):
         super().save(force_insert, force_update, using, update_fields)
 
 
-class Kpp(models.Model):
+class Subdivision(models.Model):
     kpp = models.CharField(max_length=9, null=True, blank=True, verbose_name="КПП")
+
+    is_supplier = models.BooleanField(verbose_name="Поставщик?", null=False, blank=False, default=False)
+    is_contractor = models.BooleanField(verbose_name="Покупатель?", null=False, blank=False, default=False)
 
     company = models.ForeignKey(
         "Company",
@@ -146,9 +149,6 @@ class CPGS(models.Model):
 class Company(models.Model):
     inn = models.CharField(max_length=12, null=False, blank=False, verbose_name="ИНН")
 
-    is_supplier = models.BooleanField(verbose_name="Поставщик?", null=False, blank=False, default=False)
-    is_contractor = models.BooleanField(verbose_name="Покупатель?", null=False, blank=False, default=False)
-
     class Meta:
         verbose_name = "Компания"
         verbose_name_plural = "Компании"
@@ -157,7 +157,7 @@ class Company(models.Model):
 class QuotationSession(models.Model):
     # Participant_inn, Participant_kpp
     supplier = models.ForeignKey(
-        "Company",
+        "Subdivision",
         on_delete=models.SET_NULL,
         related_name="participation",
         null=True,
@@ -224,7 +224,7 @@ class Tender(models.Model):
     item = models.CharField(max_length=255, null=False, blank=False, verbose_name="Название товара")
     # Customer_inn, Customer_kpp
     contractor = models.ForeignKey(
-        "Company",
+        "Subdivision",
         on_delete=models.CASCADE,
         related_name="tenders",
         null=False,
@@ -269,7 +269,7 @@ class Contract(models.Model):
     price = models.FloatField(verbose_name="Цена по которой заключен контракт", null=False, blank=False)
 
     contractor = models.ForeignKey(
-        "Company",
+        "Subdivision",
         on_delete=models.CASCADE,
         related_name="contracts_as_contractor",
         null=False,
@@ -277,7 +277,7 @@ class Contract(models.Model):
         verbose_name="Покупатель"
     )
     supplier = models.ForeignKey(
-        "Company",
+        "Subdivision",
         on_delete=models.CASCADE,
         related_name="contracts_as_supplier",
         null=False,
@@ -319,7 +319,7 @@ class ContractExecution(models.Model):
     delivery_date_delta = models.DurationField(null=False, blank=False, verbose_name="Разница в датах поставки")
 
     contractor = models.ForeignKey(
-        "Company",
+        "Subdivision",
         on_delete=models.CASCADE,
         related_name="contract_executions_as_contractor",
         null=False,
@@ -327,7 +327,7 @@ class ContractExecution(models.Model):
         verbose_name="Покупатель"
     )
     supplier = models.ForeignKey(
-        "Company",
+        "Subdivision",
         on_delete=models.CASCADE,
         related_name="contract_executions_as_supplier",
         null=False,
