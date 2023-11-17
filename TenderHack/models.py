@@ -100,9 +100,21 @@ class SupplierBan(models.Model):
         super().save(force_insert, force_update, using, update_fields)
 
 
+class Kpp(models.Model):
+    kpp = models.CharField(max_length=9, null=True, blank=True, verbose_name="КПП")
+
+    company = models.ForeignKey(
+        "Company",
+        on_delete=models.CASCADE,
+        related_name="kpps",
+        null=False,
+        blank=False,
+        verbose_name="Компания"
+    )
+
+
 class Company(models.Model):
     inn = models.CharField(max_length=12, null=False, blank=False, verbose_name="ИНН")
-    kpp = models.CharField(max_length=9, null=True, blank=True, verbose_name="КПП")
 
     is_supplier = models.BooleanField(verbose_name="Поставщик?", null=False, blank=False, default=False)
     is_contractor = models.BooleanField(verbose_name="Покупатель?", null=False, blank=False, default=False)
