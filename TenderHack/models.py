@@ -113,6 +113,36 @@ class Kpp(models.Model):
     )
 
 
+class CPGS(models.Model):
+    code = models.CharField(max_length=10, verbose_name="Код", null=False, blank=False)
+    name = models.CharField(max_length=255, null=False, blank=False, verbose_name="Наименование")
+
+    parent = models.ForeignKey(
+        "CPGS",
+        on_delete=models.SET_NULL,
+        related_name="children",
+        null=True,
+        blank=True,
+        verbose_name="Родительский КПГЗ"
+    )
+
+    full_path = models.CharField(max_length=255, null=False, blank=False, verbose_name="Полный путь")
+
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        full_path_codes = [self.code]
+        current_cpgs = self
+
+        while current_cpgs.parent:
+            current_cpgs = current_cpgs.parent
+            full_path_codes.append(current_cpgs.code)
+
+        full_path_codes = reversed(full_path_codes)
+        self.full_path = ".".join(full_path_codes)
+        super().save(force_insert, force_update, using, update_fields)
+
+
 class Company(models.Model):
     inn = models.CharField(max_length=12, null=False, blank=False, verbose_name="ИНН")
 
