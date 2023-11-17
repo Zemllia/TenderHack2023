@@ -1,0 +1,6 @@
+django==4.2.1
+djangorestframework
+django-filter
+Pillow
+gunicorn
+psycopg2-binary==2.8.5
