@@ -76,6 +76,10 @@ class User(AbstractBaseUser):
         return True
 
 
+class SuspicionType(models.Model):
+    name = models.CharField(max_length=255, null=False, blank=False, verbose_name="Имя")
+
+
 class SupplierBan(models.Model):
     supplier = models.ForeignKey(
         "Subdivision",
@@ -105,6 +109,8 @@ class Subdivision(models.Model):
 
     is_supplier = models.BooleanField(verbose_name="Поставщик?", null=False, blank=False, default=False)
     is_contractor = models.BooleanField(verbose_name="Покупатель?", null=False, blank=False, default=False)
+
+    date_created = models.DateTimeField(verbose_name="Дата создания", null=False, blank=False)
 
     company = models.ForeignKey(
         "Company",
@@ -149,6 +155,8 @@ class CPGS(models.Model):
 class Company(models.Model):
     inn = models.CharField(max_length=12, null=False, blank=False, verbose_name="ИНН")
 
+    date_created = models.DateTimeField(verbose_name="Дата создания", null=False, blank=False)
+
     class Meta:
         verbose_name = "Компания"
         verbose_name_plural = "Компании"
@@ -191,6 +199,8 @@ class QuotationSession(models.Model):
         default=False,
         verbose_name="Наличие нарушений по сроку подписания протокола котировочной сессии"
     )
+
+    suspicions = models.ManyToManyField("SuspicionType", related_name="tenders", verbose_name="Подозрения")
 
 
 class Region(models.Model):
@@ -240,6 +250,8 @@ class Tender(models.Model):
         blank=False,
         verbose_name="Регион"
     )
+
+    suspicions = models.ManyToManyField("SuspicionType", related_name="tenders", verbose_name="Подозрения")
 
 
 class Contract(models.Model):
