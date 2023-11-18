@@ -92,15 +92,16 @@ class SupplierBan(models.Model):
 
     reason = models.TextField(null=False, blank=False, verbose_name="Причина")
 
-    start_datetime = models.DateTimeField(null=False, blank=False, verbose_name="Дата и время начала блокировки")
-    end_datetime = models.DateTimeField(null=False, blank=False, verbose_name="Дата и время окончания блокировки")
+    start_datetime = models.DateTimeField(null=True, blank=False, verbose_name="Дата и время начала блокировки")
+    end_datetime = models.DateTimeField(null=True, blank=False, verbose_name="Дата и время окончания блокировки")
 
-    ban_duration = models.DurationField(null=False, blank=False, verbose_name="Длительность блокировки")
+    ban_duration = models.DurationField(null=True, blank=False, verbose_name="Длительность блокировки")
 
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
-        self.ban_duration = self.end_datetime - self.start_datetime
+        if self.end_datetime and self.start_datetime:
+            self.ban_duration = self.end_datetime - self.start_datetime
         super().save(force_insert, force_update, using, update_fields)
 
 
@@ -109,8 +110,6 @@ class Subdivision(models.Model):
 
     is_supplier = models.BooleanField(verbose_name="Поставщик?", null=False, blank=False, default=False)
     is_contractor = models.BooleanField(verbose_name="Покупатель?", null=False, blank=False, default=False)
-
-    date_created = models.DateTimeField(verbose_name="Дата создания", null=False, blank=False)
 
     company = models.ForeignKey(
         "Company",
@@ -155,8 +154,6 @@ class CPGS(models.Model):
 class Company(models.Model):
     inn = models.CharField(max_length=12, null=False, blank=False, verbose_name="ИНН")
 
-    date_created = models.DateTimeField(verbose_name="Дата создания", null=False, blank=False)
-
     class Meta:
         verbose_name = "Компания"
         verbose_name_plural = "Компании"
@@ -175,9 +172,6 @@ class QuotationSession(models.Model):
 
     # Is_winner
     is_winner = models.BooleanField(null=True, blank=True, verbose_name="Победитель?")
-
-    # Id_ks
-    external_id = models.IntegerField(primary_key=True, unique=True, verbose_name="ID")
 
     # Publish_date
     date_created = models.DateTimeField(null=False, blank=False, verbose_name="Дата публикации")
@@ -233,9 +227,12 @@ class Region(models.Model):
         super().save(force_insert, force_update, using, update_fields)
 
 
+
+
+
 class Tender(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False, verbose_name="Название")
-    item = models.CharField(max_length=255, null=False, blank=False, verbose_name="Название товара")
+    items = models.CharField(max_length=255, null=False, blank=False, verbose_name="Название товара")
     # Customer_inn, Customer_kpp
     contractor = models.ForeignKey(
         "Subdivision",
@@ -256,6 +253,9 @@ class Tender(models.Model):
     )
 
     suspicions = models.ManyToManyField("SuspicionType", related_name="tenders", verbose_name="Подозрения")
+
+    # Id_ks
+    external_id = models.IntegerField(primary_key=True, unique=True, verbose_name="ID")
 
 
 class Contract(models.Model):
@@ -318,6 +318,18 @@ class Contract(models.Model):
     )
 
     suspicions = models.ManyToManyField("SuspicionType", related_name="contracts", verbose_name="Подозрения")
+
+
+class TenderItem(models.Model):
+    name = models.CharField(max_length=255, null=False, blank=False, verbose_name="Название")
+    tender = models.ForeignKey(
+        "Tender",
+        on_delete=models.CASCADE,
+        related_name="items",
+        null=False,
+        blank=False,
+        verbose_name="Тендер"
+    )
 
 
 class ContractExecution(models.Model):

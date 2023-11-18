@@ -4,3 +4,5 @@ django-filter
 Pillow
 gunicorn
 psycopg2-binary==2.8.5
+beautifulsoup4==4.8.2
+requests
