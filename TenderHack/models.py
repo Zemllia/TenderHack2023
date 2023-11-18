@@ -200,7 +200,11 @@ class QuotationSession(models.Model):
         verbose_name="Наличие нарушений по сроку подписания протокола котировочной сессии"
     )
 
-    suspicions = models.ManyToManyField("SuspicionType", related_name="tenders", verbose_name="Подозрения")
+    suspicions = models.ManyToManyField(
+        "SuspicionType",
+        related_name="quotation_sessions",
+        verbose_name="Подозрения"
+    )
 
 
 class Region(models.Model):
@@ -312,6 +316,8 @@ class Contract(models.Model):
         blank=False,
         verbose_name="Статус"
     )
+
+    suspicions = models.ManyToManyField("SuspicionType", related_name="contracts", verbose_name="Подозрения")
 
 
 class ContractExecution(models.Model):
