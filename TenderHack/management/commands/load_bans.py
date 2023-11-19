@@ -12,7 +12,6 @@ class Command(BaseCommand):
     help = "Creates companies from data/companies.json file"
 
     def handle(self, *args, **options):
-        SupplierBan.objects.all().delete()
         with open(os.path.join(settings.BASE_DIR, "data/bans.json"), encoding="UTF-8") as f:
             data = json.load(f)
         companies_data = data["blocking"]

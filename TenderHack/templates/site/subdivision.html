@@ -1,0 +1,59 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+{#    {% include "site/includes/circle-beauty-data.html" with width="128px" height="128px" fill=100 icon="img/icons/hammer-icon.svg" %}#}
+{#    {% include "site/includes/circle-beauty-data.html" with width="128px" height="128px" fill=65 icon="img/icons/calendar-icon.svg" %}#}
+{#    {% include "site/includes/circle-beauty-data.html" with width="128px" height="128px" fill=30 icon="img/icons/list-icon.svg" %}#}
+    <div class="page-nav-block">
+        <div class="switcher-container">
+            <div class="swipe-left swipe">
+                <img src="{% static "img/icons/arrow.svg" %}" style="transform: rotate(180deg)" alt="arrow">
+                <img src="{% static "img/icons/list_pen.svg" %}" alt="list-pen">
+                <p class="nav-text">Контакты</p>
+            </div>
+            <h1>Реестр организаций</h1>
+            <div class="swipe-right swipe">
+                <p class="nav-text">Реестр закупок</p>
+                <img src="{% static "img/icons/cart.svg" %}" alt="cart">
+                <img src="{% static "img/icons/arrow.svg" %}" alt="arrow">
+            </div>
+        </div>
+        <div class="page-nav-items">
+            <div class="page-nav-item">
+                <div class="page-nav-item-content">
+                    <img src="{% static 'img/icons/person.svg' %}" alt="page-nav-item-content-icon">
+                    <p class="page-nav-item-content-text">ВСЕ ОРГАНИЗАЦИИ</p>
+                </div>
+                <div class="underline"></div>
+            </div>
+            <div class="page-nav-item">
+                <div class="page-nav-item-content">
+                    <img src="{% static 'img/icons/bag.svg' %}" alt="page-nav-item-content-icon">
+                    <p class="page-nav-item-content-text">ЗАКАЗЧИКИ</p>
+                </div>
+                <div class="underline"></div>
+            </div>
+            <div class="page-nav-item active">
+                <div class="page-nav-item-content">
+                    <img src="{% static 'img/icons/truck.svg' %}" alt="page-nav-item-content-icon">
+                    <p class="page-nav-item-content-text">ПОСТАВЩИКИ</p>
+                </div>
+                <div class="underline"></div>
+            </div>
+            <div class="page-nav-item">
+                <div class="page-nav-item-content">
+                    <img src="{% static 'img/icons/hand.svg' %}" alt="page-nav-item-content-icon" style="margin-top: 18px">
+                    <p class="page-nav-item-content-text" style="margin-top: 34px">ПРОИЗВОДИТЕЛИ</p>
+                </div>
+                <div class="underline"></div>
+            </div>
+        </div>
+    </div>
+    <div class="data">
+        <p class="gray-info-font">Найдено 9999999</p>
+        <div class="filters-container">
+
+        </div>
+    </div>
+{% endblock %}

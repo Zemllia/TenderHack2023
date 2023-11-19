@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'rq_feedback.wsgi.application'
+WSGI_APPLICATION = 'TenderHack.wsgi.application'
 
 
 # Database
@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'rq_feedback.wsgi.application'
 if DEBUG:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+            "NAME": os.environ.get("POSTGRES_DB", os.path.join(BASE_DIR, "db.sqlite3")),
+            "USER": os.environ.get("POSTGRES_USER", "user"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
+            "HOST": "localhost",
+            "PORT": os.environ.get("SQL_PORT", "5432"),
         }
     }
 else:
@@ -172,7 +176,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 APPEND_SLASH = False
 
-CSRF_TRUSTED_ORIGINS = ['https://bilgir.kz', 'https://www.bilgir.kz']
+CSRF_TRUSTED_ORIGINS = ['http://0.0.0.0:5000', 'https://www.bilgir.kz']
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'

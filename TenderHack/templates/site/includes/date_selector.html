@@ -1,0 +1,16 @@
+<div class="input-custom-group" style="width: 100%;">
+    <p style="margin-bottom: 7px">Выбрать период времени</p>
+    <input type="text" name="daterange" value="" />
+</div>
+
+<script>
+$(function() {
+  $('input[name="daterange"]').daterangepicker({
+    opens: 'left',
+    locale: {
+      format: 'DD.MM.YYYY'
+    }
+  }, function(start, end, label) {
+  });
+});
+</script>

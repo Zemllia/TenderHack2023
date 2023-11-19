@@ -1,0 +1,14 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="tab_customers_icon.e682314c6df2a353882e98793efa6504 1">
+<path id="Vector" opacity="0.2" d="M48.8125 31V40.2501H28V42.5627V86.5H92.75V40.2501H71.9375V31H48.8125Z" fill="url(#paint0_linear_43_22245)"/>
+<path id="Vector_2" d="M38.8125 22V31.2501H18V33.5627V77.5H82.75V31.2501H61.9375V22H38.8125ZM43.4375 26.6251H57.3125V31.2501H43.4375V26.6251ZM22.625 35.8749H78.125V52.0627H68.875V47.4376H64.25V52.0627H36.5V47.4376H31.875V52.0627H22.625V35.8749ZM22.625 56.6875H31.875V61.3126H36.5V56.6875H64.25V61.3126H68.875V56.6875H78.125V72.875H22.625V56.6875Z" fill="#7FB3E3"/>
+<path id="Vector_3" d="M37 47H31V62H37V47Z" fill="#264B82"/>
+<path id="Vector_4" d="M69 47H63V62H69V47Z" fill="#264B82"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_43_22245" x1="60.4288" y1="31.0737" x2="60.4288" y2="86.4755" gradientUnits="userSpaceOnUse">
+<stop stop-color="#077EBB"/>
+<stop offset="1" stop-color="#077EBB" stop-opacity="0"/>
+</linearGradient>
+</defs>
+</svg>

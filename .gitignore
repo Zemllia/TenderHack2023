@@ -8,4 +8,4 @@ pgdata
 media_files
 .env
 db.json
-
+data

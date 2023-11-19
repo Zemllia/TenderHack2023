@@ -1,0 +1,9 @@
+{% load static %}
+<div class="circle-beauty-data" style="width: {{ width }}; height: {{ height }}">
+    <img alt="img" src="{% static icon %}" style="width: 80%; height: 80%; position: absolute; left: 50%; transform: translate(-50%, 12.5%);">
+    <div class="circle-container" style="width: {{ width }}; height: {{ fill }}%; overflow: hidden; transform: rotate(180deg); z-index: -1">
+        <div class="circle" style="width: {{ width }}; height: {{ height }}; border-radius: 128px; background: {% if fill > 66 %}#039855{% elif fill > 33 and fill <= 66 %}#FFA717{% else %}#DB2B21{% endif %};">
+        </div>
+    </div>
+    <p class="fill-text">{{ fill }}%</p>
+</div>

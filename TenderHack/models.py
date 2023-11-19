@@ -1,5 +1,8 @@
+import datetime
+
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.db import models
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -104,12 +107,21 @@ class SupplierBan(models.Model):
             self.ban_duration = self.end_datetime - self.start_datetime
         super().save(force_insert, force_update, using, update_fields)
 
+    class Meta:
+        verbose_name = "Блокировка"
+        verbose_name_plural = "Блокировки"
+
 
 class Subdivision(models.Model):
     kpp = models.CharField(max_length=9, null=True, blank=True, verbose_name="КПП")
 
     is_supplier = models.BooleanField(verbose_name="Поставщик?", null=False, blank=False, default=False)
     is_contractor = models.BooleanField(verbose_name="Покупатель?", null=False, blank=False, default=False)
+
+    creation_datetime = models.DateTimeField(verbose_name="Дата и время создания", null=True, blank=False, default=None)
+
+    date_delta = models.DurationField(null=True, blank=False, verbose_name="Разница")
+    # last_win_delta = models.DurationField(null=True, blank=False, verbose_name="Разница от последней подбеды")
 
     company = models.ForeignKey(
         "Company",
@@ -119,6 +131,22 @@ class Subdivision(models.Model):
         blank=False,
         verbose_name="Компания"
     )
+
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        participation = self.participation.order_by("-tender__date_created").first()
+        if participation:
+            last_participation_date = participation.tender.date_created
+            self.date_delta = timezone.now() - last_participation_date
+        super().save(force_insert, force_update, using, update_fields)
+
+    def __str__(self):
+        return self.kpp
+
+    class Meta:
+        verbose_name = "Подразделение"
+        verbose_name_plural = "Подразделения"
 
 
 class CPGS(models.Model):
@@ -150,6 +178,13 @@ class CPGS(models.Model):
         self.full_path = ".".join(full_path_codes)
         super().save(force_insert, force_update, using, update_fields)
 
+    def __str__(self):
+        return f"{self.full_path} {self.name}"
+
+    class Meta:
+        verbose_name = "КПГЗ"
+        verbose_name_plural = "КПГЗ"
+
 
 class Company(models.Model):
     inn = models.CharField(max_length=12, null=False, blank=False, verbose_name="ИНН")
@@ -173,11 +208,6 @@ class QuotationSession(models.Model):
     # Is_winner
     is_winner = models.BooleanField(null=True, blank=True, verbose_name="Победитель?")
 
-    # Publish_date
-    date_created = models.DateTimeField(null=False, blank=False, verbose_name="Дата публикации")
-
-    price = models.FloatField(null=False, blank=False, verbose_name="Начальная максимальная цена")
-
     tender = models.ForeignKey(
         "Tender",
         on_delete=models.CASCADE,
@@ -187,18 +217,15 @@ class QuotationSession(models.Model):
         verbose_name="Тендер"
     )
 
-    violations = models.BooleanField(
-        null=False,
-        blank=False,
-        default=False,
-        verbose_name="Наличие нарушений по сроку подписания протокола котировочной сессии"
-    )
-
     suspicions = models.ManyToManyField(
         "SuspicionType",
         related_name="quotation_sessions",
         verbose_name="Подозрения"
     )
+
+    class Meta:
+        verbose_name = "Участие в котировочных сессиях"
+        verbose_name_plural = "Участия в котировочных сессиях"
 
 
 class Region(models.Model):
@@ -227,12 +254,8 @@ class Region(models.Model):
         super().save(force_insert, force_update, using, update_fields)
 
 
-
-
-
 class Tender(models.Model):
-    name = models.CharField(max_length=255, null=False, blank=False, verbose_name="Название")
-    items = models.CharField(max_length=255, null=False, blank=False, verbose_name="Название товара")
+    name = models.TextField(null=False, blank=False, verbose_name="Название")
     # Customer_inn, Customer_kpp
     contractor = models.ForeignKey(
         "Subdivision",
@@ -242,6 +265,10 @@ class Tender(models.Model):
         blank=False,
         verbose_name="Заказчик"
     )
+
+    price = models.FloatField(null=True, blank=False, verbose_name="Начальная максимальная цена")
+    # Publish_date
+    date_created = models.DateTimeField(null=True, blank=False, verbose_name="Дата публикации")
 
     region = models.ForeignKey(
         "Region",
@@ -256,6 +283,21 @@ class Tender(models.Model):
 
     # Id_ks
     external_id = models.IntegerField(primary_key=True, unique=True, verbose_name="ID")
+    CPGSs = models.ManyToManyField("CPGS", related_name="tenders", verbose_name="КПГЗ")
+
+    violations = models.BooleanField(
+        null=False,
+        blank=False,
+        default=False,
+        verbose_name="Наличие нарушений по сроку подписания протокола котировочной сессии"
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Тендер"
+        verbose_name_plural = "Тендеры"
 
 
 class Contract(models.Model):
@@ -271,13 +313,13 @@ class Contract(models.Model):
         (STATUS_REFUSAL_OF_CONCLUSION, "Отказ от заключения"),
     )
 
-    quotation_session = models.ForeignKey(
-        "QuotationSession",
+    tender = models.ForeignKey(
+        "Tender",
         on_delete=models.CASCADE,
         related_name="contracts",
-        null=False,
-        blank=False,
-        verbose_name="Котировочная сессия"
+        null=True,
+        blank=True,
+        verbose_name="Тендер"
     )
 
     external_id = models.IntegerField(primary_key=True, unique=True, verbose_name="ID")
@@ -319,9 +361,13 @@ class Contract(models.Model):
 
     suspicions = models.ManyToManyField("SuspicionType", related_name="contracts", verbose_name="Подозрения")
 
+    class Meta:
+        verbose_name = "Контракт"
+        verbose_name_plural = "Контракты"
+
 
 class TenderItem(models.Model):
-    name = models.CharField(max_length=255, null=False, blank=False, verbose_name="Название")
+    name = models.TextField(null=False, blank=False, verbose_name="Название")
     tender = models.ForeignKey(
         "Tender",
         on_delete=models.CASCADE,
@@ -331,14 +377,21 @@ class TenderItem(models.Model):
         verbose_name="Тендер"
     )
 
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Предмет закупки"
+        verbose_name_plural = "Предметы закупки"
+
 
 class ContractExecution(models.Model):
     contract = models.ForeignKey(
         "Contract",
         on_delete=models.CASCADE,
         related_name="executions",
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         verbose_name="Контракт"
     )
 
@@ -370,4 +423,8 @@ class ContractExecution(models.Model):
     ):
         self.delivery_date_delta = self.scheduled_delivery_date - self.actual_delivery_date
         super().save(force_insert, force_update, using, update_fields)
+
+    class Meta:
+        verbose_name = "Исполнение контракта"
+        verbose_name_plural = "Исполнения контракта"
 

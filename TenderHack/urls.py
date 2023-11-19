@@ -17,9 +17,16 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path, include
+
+from TenderHack import views
+
+from .api.v1.urls import urlpatterns as api_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.index),
+    path('comparsion/', views.comparsion),
+    re_path(r'^api/v1/', include(api_urlpatterns)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

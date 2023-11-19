@@ -1,0 +1,153 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="page-control-block-container">
+        <div class="page-control-block">
+            <div class="page-nav-block">
+                <div class="switcher-container">
+                    <div class="swipe-left swipe" onclick="window.location.href='/'">
+                        <img src="{% static "img/icons/arrow.svg" %}" style="transform: rotate(180deg)" alt="arrow">
+                        <p class="nav-text">Назад</p>
+                    </div>
+                    <h1>Сравнение организаций</h1>
+                    <div class="swipe-right swipe">
+                    </div>
+                </div>
+            </div>
+            <div class="index-control">
+                <p class="gray-info-font">Количество подразделений {{ subdivisions_count }}</p>
+                <div class="show-filters-button">
+                    <div class="show-filters-button-text">
+                        <p>Показать фильтры</p>
+                        <div class="show-filters-button-text-underline"></div>
+                    </div>
+                    <img src="{% static "img/icons/arrow_down.svg" %}" alt="arrow-down">
+                </div>
+            </div>
+            <div class="filters-container">
+                <div class="filters" style="margin-top: 40px">
+                    <div class="column column-left">
+                        {% include "site/includes/city_select.html" with data_url="/api/v1/regions/" %}
+                        {% include "site/includes/inn_select.html" with data_url="/api/v1/kpp/" %}
+                    </div>
+                    <div class="column column-right">
+                        {% include "site/includes/tags_select.html" with data_url="/api/v1/cpgs/" %}
+                    </div>
+                </div>
+            </div>
+            <div class="filters-buttons-row">
+                <button type="button" class="button-transparent" id="drop-filters">Сброс</button>
+                <button type="button" class="button-primary" id="apply-filters">Добавить</button>
+            </div>
+        </div>
+    </div>
+    <div class="items-container">
+        <div class="sort-block">
+            <p>Сортировка: </p>
+        </div>
+        <div class="items">
+            <div class="item-container">
+                <div class="item">
+                    <div class="item-image">
+                        <img src="{% static 'img/no_photo.svg' %}" alt="no-photo">
+                    </div>
+                    <div class="item-top">
+                        <div class="top-items">
+                            <div class="name-info">
+                                <div class="short-data">
+                                    <div class="short-data-item">
+                                        <img src="{% static 'img/icons/person_with_box.svg' %}">
+                                        <p>Поставщик, заказчик</p>
+                                    </div>
+                                    <div class="short-data-item">
+                                        <p>Лучще чем 80% организаций</p>
+                                    </div>
+                                    <div class="short-data-item">
+                                        <div class="round-small"></div>
+                                        <p>Активен</p>
+                                    </div>
+                                </div>
+                                <h2>ГОСУДАРСТВЕННОЕ УНИТАРНОЕ ПРЕДПРИЯТИЕ ГОРОДА МОСКВЫ «МОСКОВСКИЙ СОЦИАЛЬНЫЙ РЕГИСТР»</h2>
+                            </div>
+                            <div class="region-info">
+                                <p>Регион</p>
+                                <div class="item-small-info-item-row">
+                                    <img src="{% static 'img/icons/city_icon.svg' %}">
+                                    <p>Центральный административный округ</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="legal-info">
+                            <div class="legal-info-column">
+                                <div class="legal-info-item">
+                                    <p>ИНН</p>
+                                    <p>0000000000</p>
+                                </div>
+                            </div>
+                            <div class="legal-info-column">
+                                <div class="legal-info-item">
+                                    <p>КПП</p>
+                                    <p>000000000</p>
+                                </div>
+                            </div>
+                            <div class="legal-info-column">
+                                <div class="legal-info-item">
+                                    <p>Рейтинга</p>
+                                    <p>60%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-bottom">
+                    <div class="item-bottom-left-side">
+                        <div class="item-bottom-item">
+                            <img src="{% static 'img/icons/two_squares.svg' %}">
+                            <p>Зарегистрирован на ПП</p>
+                        </div>
+                        <div class="item-bottom-item">
+                            <img src="{% static 'img/icons/flag.svg' %}">
+                            <p>Российский производитель</p>
+                        </div>
+                        <div class="item-bottom-item">
+                            <p>Действия</p>
+                            <img  src="{% static 'img/icons/compare.svg' %}">
+                        </div>
+                    </div>
+                    <div class="item-bottom-right-side">
+                        <div class="item-bottom-item">
+                            <img src="{% static 'img/icons/compare.svg' %}">
+                            <p>Сравнить</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+
+            $("#apply-filters").click(function () {
+                let regions = $("#regions-search-select").select2("val")
+                let categories = $("#category-search-select").select2("val")
+                let dates = $("input[name='daterange']").val().split("-")
+                let start_date = dates[0].trim()
+                let end_date = dates[1].trim()
+                let use_unverified = $("#use-unverified-checkbox").is(":checked")
+
+                $.ajax()
+            })
+        })
+
+        function load_data(limit, offset, regions, categories, start_date, end_date, use_unverified){
+            $.ajax("/api/v1/suppliers/", {
+                limit: limit,
+                offset: offset,
+                participation__tender__region__code: regions,
+                participation__tender__CPGSs__id: categories,
+
+            })
+        }
+    </script>
+{% endblock %}

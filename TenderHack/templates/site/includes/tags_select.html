@@ -1,0 +1,13 @@
+<div class="input-custom-group" style="width: 98%;">
+    <p style="margin-bottom: 7px">Ключевые слова по товарам</p>
+    <select id="tags-search-select" name="tags[]" multiple="multiple" style="width: 98%">
+    </select>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#tags-search-select').select2({
+          tags: true
+        });
+    })
+</script>
